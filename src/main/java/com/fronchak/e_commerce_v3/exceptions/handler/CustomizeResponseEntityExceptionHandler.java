@@ -18,6 +18,7 @@ import com.fronchak.e_commerce_v3.exceptions.ValidationExceptionResponse;
 @RestControllerAdvice
 public class CustomizeResponseEntityExceptionHandler {
 
+	/*
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
@@ -63,4 +64,5 @@ public class CustomizeResponseEntityExceptionHandler {
 		ExceptionResponse response = makeResponse(new ExceptionResponse(), e, request, status, "Internal Server Error");
 		return ResponseEntity.status(status).body(response);
 	}
+	*/
 }
