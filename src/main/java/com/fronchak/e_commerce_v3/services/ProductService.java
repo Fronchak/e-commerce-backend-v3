@@ -1,0 +1,99 @@
+package com.fronchak.e_commerce_v3.services;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fronchak.e_commerce_v3.dtos.product.ProductInputDTO;
+import com.fronchak.e_commerce_v3.dtos.product.ProductInsertDTO;
+import com.fronchak.e_commerce_v3.dtos.product.ProductOutputDTO;
+import com.fronchak.e_commerce_v3.dtos.product.ProductSimpleOutputDTO;
+import com.fronchak.e_commerce_v3.dtos.product.ProductUpdateDTO;
+import com.fronchak.e_commerce_v3.entities.Product;
+import com.fronchak.e_commerce_v3.exceptions.DatabaseException;
+import com.fronchak.e_commerce_v3.exceptions.ResourceNotFoundException;
+import com.fronchak.e_commerce_v3.mappers.ProductMapper;
+import com.fronchak.e_commerce_v3.repositories.BrandRepository;
+import com.fronchak.e_commerce_v3.repositories.CategoryRepository;
+import com.fronchak.e_commerce_v3.repositories.ProductRepository;
+
+@Service
+public class ProductService {
+
+	@Autowired
+	private ProductRepository productRepository;
+	
+	@Autowired
+	private BrandRepository brandRepository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private ProductMapper mapper;
+	
+	@Transactional
+	public ProductOutputDTO save(ProductInsertDTO inputDTO) {
+		try {
+			Product entity = new Product();
+			copyDTOToEntity(inputDTO, entity);
+			entity = productRepository.save(entity);
+			return mapper.convertProductToProductOutputDTO(entity);	
+		}
+		catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Error in saving product, brand or categories invalids");
+		}
+	}
+	
+	private void copyDTOToEntity(ProductInputDTO dto, Product entity) {
+		mapper.copyProductInputDTOToProduct(dto, entity);
+		entity.setBrand(brandRepository.getReferenceById(dto.getIdBrand()));
+		entity.getCategories().clear();
+		dto.getIdCategories().forEach((idCategory) -> {
+			entity.addCategory(categoryRepository.getReferenceById(idCategory));
+		});
+	}
+	
+	@Transactional
+	public ProductOutputDTO update(ProductUpdateDTO updateDTO, Long id) {
+		try {
+			Product entity = productRepository.getReferenceById(id);
+			copyDTOToEntity(updateDTO, entity);
+			entity = productRepository.save(entity);
+			return mapper.convertProductToProductOutputDTO(entity);
+		}
+		catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Error updating product");
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	public ProductOutputDTO findById(Long id) {
+		Product entity = productRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Product", id.toString()));
+		return mapper.convertProductToProductOutputDTO(entity);
+	}
+	
+	@Transactional(readOnly = true)
+	public Page<ProductSimpleOutputDTO> findAllFilter() {
+		
+		return null;
+	}
+	
+	public void deleteById(Long id) {
+		try {
+			productRepository.deleteById(id);
+		}
+		catch(EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("Product", id.toString());
+		}
+		catch(DataIntegrityViolationException e) {
+			throw new DatabaseException("Product cannot be deleted");
+		}
+	}
+}
