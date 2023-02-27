@@ -8,4 +8,5 @@ import com.fronchak.e_commerce_v3.entities.Brand;
 @Repository
 public interface BrandRepository extends JpaRepository<Brand, Long> {
 
+	Brand findByName(String name);
 }

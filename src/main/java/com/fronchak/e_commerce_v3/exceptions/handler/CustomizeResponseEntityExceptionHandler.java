@@ -18,7 +18,7 @@ import com.fronchak.e_commerce_v3.exceptions.ValidationExceptionResponse;
 @RestControllerAdvice
 public class CustomizeResponseEntityExceptionHandler {
 
-	/*
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
@@ -36,14 +36,14 @@ public class CustomizeResponseEntityExceptionHandler {
 		response.setPath(request.getDescription(false));
 		return response;
 	}
-	
+	/*
 	@ExceptionHandler(DatabaseException.class)
 	public ResponseEntity<ExceptionResponse> handleDatabaseException(DatabaseException e, WebRequest request) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		ExceptionResponse response = makeResponse(new ExceptionResponse(), e, request, status, DatabaseException.getError());
 		return ResponseEntity.status(status).body(response);
 	}
-	
+	*/
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ValidationExceptionResponse> handleMethodArgumentNotValidException(
 			MethodArgumentNotValidException e, WebRequest request) {
@@ -57,7 +57,7 @@ public class CustomizeResponseEntityExceptionHandler {
 		
 		return ResponseEntity.status(status).body(response);
 	}
-	
+	/*
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ExceptionResponse> handleException(Exception e, WebRequest request) {
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
